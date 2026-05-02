@@ -7,8 +7,5 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TinyDriveApplicationTest {
-    @Test void appHasAGreeting() {
-        TinyDriveApplication classUnderTest = new TinyDriveApplication();
-        assertNotNull(classUnderTest.getGreeting(), "app should have a greeting");
-    }
+
 }

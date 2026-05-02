@@ -3,12 +3,15 @@
  */
 package dev.chan.drive;
 
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
 public class TinyDriveApplication {
-    public String getGreeting() {
-        return "Hello World!";
-    }
 
     public static void main(String[] args) {
-        System.out.println(new TinyDriveApplication().getGreeting());
+        SpringApplication.run(TinyDriveApplication.class, args);
+
     }
 }
