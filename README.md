@@ -1,68 +1,88 @@
-📌 서비스 개요
+# Tiny Drive
 
-Google Drive와 유사한 문서 관리 시스템(DMS)을 목표로 하며,
-파일 업로드, 버전 관리, 권한 제어, 비동기 이벤트 기반 처리 구조를 중심으로 설계한다.
+내 손안의 작은 드라이브, Tiny Drive 입니다.
 
-⸻
+Tiny Drive는 Google Drive 스타일의 클라우드 기반 DMS(Document Management System)를 목표로 하는 프로젝트입니다.
 
-🧩 기능 요구사항 (Functional Requirements)
+단순 파일 저장소를 넘어,
+대용량 파일 업로드, 문서 관리, 권한 관리, 비동기 처리, 확장 가능한 인프라 구조를 학습하고 설계하는 것을 목표로 합니다.
 
-1. 파일/폴더 관리
+---
 
-* 사용자는 파일 및 폴더를 생성할 수 있다.
-* 폴더 계층 구조를 구성할 수 있다.
-* 파일 및 폴더를 이동/삭제할 수 있다.
+## Features
 
-2. 파일 업로드
+- JWT 기반 인증
+- 파일 업로드 / 다운로드
+- 폴더 기반 문서 관리
+- 파일 메타데이터 관리
+- Redis 기반 JWT 토큰 관리
+- Nginx Reverse Proxy 기반 라우팅
+- Docker Container 기반 서비스 분리
+- GitHub Actions 기반 CI/CD 자동화
 
-* 사용자는 파일을 업로드할 수 있다.
-* 대용량 파일 업로드를 지원한다.
+---
 
-3. 파일 버전 관리
+## Tech Stack
 
-* 파일은 여러 버전을 가질 수 있다.
-* 특정 버전을 다운로드할 수 있다.
+### Backend
 
-4. 권한 관리
+- Java 21
+- Spring Boot 3.x
+- Spring Security
+- JPA (Hibernate)
+- MySQL
+- Redis
+- Docker
+- Nginx
 
-* 사용자별 접근 권한을 설정할 수 있다.
-* 파일 이동/삭제 시 권한 검증이 수행된다.
+### Infrastructure
 
-5. 비동기 처리
+- EC2
+- GitHub Actions
+- Docker Compose
 
-* 파일 업로드 완료 시 이벤트를 발행한다.
-* 썸네일 생성 및 후처리는 비동기로 처리한다.
+---
 
-⸻
+## Architecture
 
-⚙️ 비기능 요구사항 (Non-Functional Requirements)
+### MVP Architecture
 
-1. 성능
+[![MVP Architecture](docs/infra/infra-mvp.png)](docs/infra/infra-mvp.md)
 
-* 대용량 파일 업로드 시 병렬 업로드를 지원한다.
-* 썸네일 생성은 비동기로 처리하여 응답 시간을 최소화한다.
+---
 
-2. 확장성
+## Docs
 
-* 파일 처리 로직은 이벤트 기반 구조로 설계한다.
-* Kafka 또는 메시지 큐를 활용하여 확장 가능하도록 한다.
+- [MVP Architecture](docs/infra/infra-mvp.md)
+- [API Spec](docs/api/openapi.yaml)
+- [ERD](docs/erd/erd-mvp.md)
+- [ADR](docs/adr)
 
-3. 일관성
+---
 
-* 파일 메타데이터와 실제 파일 상태 간 정합성을 유지한다.
-* 업로드 완료 이벤트를 기준으로 상태를 동기화한다.
+## Future Goals
 
-4. 장애 대응
+- AWS S3 기반 파일 스토리지 확장
+- Presigned URL 기반 업로드
+- 이벤트 기반 파일 처리 구조
+- 썸네일 비동기 생성
+- CQRS 기반 조회 최적화
+- Read Replica 분리
+- CloudFront CDN 도입
 
-* 비동기 처리 실패 시 재처리(DLQ 또는 retry)를 지원한다.
-* 이벤트 처리 중 장애 발생 시 시스템 전체에 영향이 없도록 격리한다.
+---
 
-5. 유지보수성
+## Why Tiny Drive?
 
-* 도메인 중심 설계(DDD)를 적용한다.
-* build-logic 기반으로 빌드 설정을 분리한다.
+본 프로젝트는 단순 CRUD 구현보다,
+실제 문서 관리 시스템에서 발생할 수 있는 문제들을 고민하고 해결하는 과정에 집중합니다.
 
-6. 테스트
+특히 다음과 같은 주제를 학습하고자 합니다.
 
-* Testcontainers를 사용하여 실제 DB 기반 테스트를 수행한다.
-* 단위 테스트와 통합 테스트를 분리한
+- 확장 가능한 아키텍처 설계
+- 무상태 인증(JWT)
+- 파일 업로드 전략
+- Reverse Proxy 및 배포 구조
+- Docker 기반 운영 환경
+- DDD 기반 설계
+- 이벤트 기반 아키텍처
