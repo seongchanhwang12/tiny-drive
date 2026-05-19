@@ -1,0 +1,122 @@
+# =========================
+# Build Artifacts
+# =========================
+
+build/
+out/
+target/
+dist/
+
+# =========================
+# Gradle
+# =========================
+
+.gradle/
+gradle-app.setting
+!gradle/wrapper/gradle-wrapper.properties
+!gradle/wrapper/gradle-wrapper.jar
+
+# =========================
+# IDE
+# =========================
+
+.idea/
+*.iml
+.vscode/
+
+# =========================
+# Logs
+# =========================
+
+logs/
+*.log
+
+# =========================
+# Coverage / Reports
+# =========================
+
+coverage/
+jacoco/
+reports/
+test-results/
+
+# =========================
+# Generated Sources
+# =========================
+
+generated/
+generated-src/
+src/generated/
+build/generated/
+
+# =========================
+# Node / Frontend
+# =========================
+
+node_modules/
+.npm/
+.next/
+.nuxt/
+
+# =========================
+# OS Files
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# =========================
+# Runtime / Temp
+# =========================
+
+tmp/
+temp/
+.cache/
+
+# =========================
+# Binary / Large Files
+# =========================
+
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.pdf
+*.zip
+*.tar
+*.gz
+
+# =========================
+# Secrets
+# =========================
+
+.env
+.env.*
+*.pem
+*.key
+*.p12
+
+# =========================
+# Infra Noise
+# =========================
+
+terraform.tfstate
+terraform.tfstate.*
+.terraform/
+
+# =========================
+# Git Noise
+# =========================
+
+.git/
+
+# =========================
+# Keep Important Context
+# =========================
+
+!README.md
+!AGENTS.md
+!docs/
+!adr/
+!architecture/
