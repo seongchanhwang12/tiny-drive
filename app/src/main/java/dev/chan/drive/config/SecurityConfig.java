@@ -1,4 +1,4 @@
-package dev.chan.drive.web;
+package dev.chan.drive.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
