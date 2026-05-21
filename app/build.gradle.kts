@@ -8,9 +8,12 @@
 
 plugins {
     id("drive.spring-web")
+    id("drive.spring-jpa")
+    id("drive.lombok")
 }
 
-dependencies {}
+dependencies {
+}
 
 springBoot {
     mainClass.set("dev.chan.drive.TinyDriveApplication")

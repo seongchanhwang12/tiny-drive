@@ -1,7 +1,7 @@
-plugins{
+plugins {
     id("drive.spring-base")
 }
 
-dependencies{
+dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
 }
