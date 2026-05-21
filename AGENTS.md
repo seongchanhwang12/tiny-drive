@@ -20,6 +20,7 @@
 ## Global Forbidden Rules
 
 Do NOT:
+
 - Introduce Open Session In View (OSIV)
 - Introduce uncontrolled fetch joins or new N+1 risks
 - Expose JPA entities to API layer
@@ -70,6 +71,7 @@ Execute sequentially. Any failure blocks further work or merge.
 ```
 
 Validate:
+
 - Aggregate invariants
 - Domain rules
 - Value object behavior
@@ -83,6 +85,7 @@ Validate:
 ```
 
 Validate:
+
 - JPA mappings
 - Query correctness
 - N+1 risks
@@ -96,6 +99,7 @@ Validate:
 ```
 
 Validate:
+
 - Use case orchestration
 - Transaction boundaries
 - Event flow consistency
@@ -109,6 +113,7 @@ Validate:
 ```
 
 Required:
+
 - Zero failing tests
 - Zero compilation failures
 - Zero unchecked dependency changes
@@ -119,6 +124,7 @@ Required:
 ## Merge Blocking Conditions
 
 A change is invalid if it:
+
 - Breaks aggregate boundaries
 - Introduces bidirectional aggregate coupling
 - Introduces new N+1 risks
@@ -131,6 +137,34 @@ A change is invalid if it:
 - Violates asynchronous processing guarantees
 
 ---
+
+## Test Conventions
+
+### General
+
+- Prefer readable and behavior-focused tests.
+- Follow BDD-style test structure: given / when / then.
+- Use `@DisplayName` to describe business behavior.
+
+### Mockito
+
+- Prefer BDDMockito APIs over classic Mockito APIs.
+- Use:
+    - `given()` instead of `when()`
+    - `then().should()` instead of `verify()`
+
+Example:
+
+``` java
+given(userRepository.existsByEmail(email))
+    .willReturn(true);
+
+then(userRepository)
+    .should()
+    .save(any(User.class));
+ ```
+
+--- 
 
 ## Agent Behavioral Constraints
 
