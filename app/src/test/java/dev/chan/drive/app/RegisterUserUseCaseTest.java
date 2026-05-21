@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @DisplayName("회원가입 유스케이스")
 @ExtendWith(MockitoExtension.class)
@@ -28,6 +29,7 @@ class RegisterUserUseCaseTest {
   private static final Long DRIVE_ID = 10L;
   private static final String VALID_EMAIL = "test@example.com";
   private static final String VALID_PASSWORD = "Password123!";
+  private static final String ENCODED_PASSWORD = "Encoded-password";
 
   @InjectMocks RegisterUserUseCase registerUserUseCase;
 
@@ -35,12 +37,15 @@ class RegisterUserUseCaseTest {
 
   @Mock DriveRepository driveRepository;
 
+  @Mock PasswordEncoder passwordEncoder;
+
   @DisplayName("전달받은 값이 유효하면 회원가입에 성공하고 개인문서함 생성 요청을 수행한다")
   @Test
   void register_user_success() {
     // given
     RegisterUserUseCase.Input input = validInput();
 
+    given(passwordEncoder.encode(any())).willReturn(ENCODED_PASSWORD);
     given(userRepository.existsByEmail(input.email())).willReturn(false);
     given(userRepository.save(any(User.class))).willReturn(savedUser());
     given(driveRepository.save(any(Drive.class))).willReturn(savedPersonalDrive());
@@ -54,6 +59,7 @@ class RegisterUserUseCaseTest {
     assertThat(output.driveId()).isEqualTo(DRIVE_ID);
 
     then(userRepository).should().existsByEmail(VALID_EMAIL);
+    then(passwordEncoder).should().encode(VALID_PASSWORD);
     then(userRepository).should().save(any(User.class));
     then(driveRepository).should().save(any(Drive.class));
   }
@@ -71,6 +77,7 @@ class RegisterUserUseCaseTest {
         .isInstanceOf(DuplicateEmailException.class);
 
     then(userRepository).should().existsByEmail(VALID_EMAIL);
+    then(passwordEncoder).should(never()).encode(VALID_PASSWORD);
     then(userRepository).should(never()).save(any(User.class));
     then(driveRepository).should(never()).save(any(Drive.class));
   }
@@ -80,7 +87,7 @@ class RegisterUserUseCaseTest {
   }
 
   private User savedUser() {
-    return new User(USER_ID, VALID_EMAIL, VALID_PASSWORD);
+    return new User(USER_ID, VALID_EMAIL, ENCODED_PASSWORD);
   }
 
   private Drive savedPersonalDrive() {

@@ -6,6 +6,7 @@ import dev.chan.drive.domain.User;
 import dev.chan.drive.repository.DriveRepository;
 import dev.chan.drive.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ public class RegisterUserUseCase {
 
   private final UserRepository userRepository;
   private final DriveRepository driveRepository;
+  private final PasswordEncoder passwordEncoder;
 
   public record Input(String email, String pw) {}
 
@@ -30,7 +32,8 @@ public class RegisterUserUseCase {
       throw new DuplicateEmailException("Email already exists");
     }
 
-    User newUser = User.register(input.email(), input.pw());
+    String encodedPw = passwordEncoder.encode(input.pw);
+    User newUser = User.register(input.email(), encodedPw);
     User savedUser = userRepository.save(newUser);
 
     Drive personal = Drive.personal(savedUser.getId());
