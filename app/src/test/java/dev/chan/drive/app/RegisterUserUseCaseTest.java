@@ -91,6 +91,6 @@ class RegisterUserUseCaseTest {
   }
 
   private Drive savedPersonalDrive() {
-    return Drive.builder().id(DRIVE_ID).ownerId(USER_ID).type(DriveType.PERSONAL).build();
+    return Drive.builder().id(DRIVE_ID).userId(USER_ID).type(DriveType.PERSONAL).build();
   }
 }

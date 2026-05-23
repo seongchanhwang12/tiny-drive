@@ -4,19 +4,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import javax.print.DocFlavor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Drive {
+public class Drive extends Common {
   private static final long GB = 1024L * 1024L * 1024L;
   private static final long DEFAULT_QUOTA_BYTES = 50 * GB;
 
@@ -24,7 +20,7 @@ public class Drive {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private long ownerId;
+  private long userId;
   private DriveType type;
   private long usedBytes;
   private long quotaBytes;

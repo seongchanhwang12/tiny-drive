@@ -1,9 +1,6 @@
 package dev.chan.drive.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Builder
@@ -11,7 +8,8 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class User {
+@Table(name = "users")
+public class User extends Common {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
