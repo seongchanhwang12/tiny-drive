@@ -6,10 +6,12 @@ import dev.chan.drive.domain.User;
 import dev.chan.drive.repository.DriveRepository;
 import dev.chan.drive.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegisterUserUseCase {
@@ -28,7 +30,10 @@ public class RegisterUserUseCase {
 
   @Transactional
   public Output execute(Input input) {
+    log.info("User signup requested. email={}", input.email());
+
     if (userRepository.existsByEmail(input.email())) {
+      log.warn("User signup rejected. reason=duplicate_email email={}", input.email());
       throw new DuplicateEmailException("Email already exists");
     }
 
@@ -38,6 +43,12 @@ public class RegisterUserUseCase {
 
     Drive personal = Drive.personal(savedUser.getId());
     Drive savedDrive = driveRepository.save(personal);
+
+    log.info(
+        "User signup completed. userId={} driveId={} email={}",
+        savedUser.getId(),
+        savedDrive.getId(),
+        savedUser.getEmail());
 
     return Output.of(savedUser, savedDrive);
   }

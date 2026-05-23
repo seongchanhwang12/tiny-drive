@@ -25,7 +25,7 @@ class RegisterUserControllerTest {
 
   @Mock private RegisterUserUseCase registerUserUseCase;
 
-  @InjectMocks private RegisterUserController registerUserController;
+  @InjectMocks private UserController registerUserController;
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 

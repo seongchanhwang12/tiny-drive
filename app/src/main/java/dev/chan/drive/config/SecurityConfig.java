@@ -23,7 +23,7 @@ public class SecurityConfig {
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
-            auth -> auth.requestMatchers("/api/users").permitAll().anyRequest().authenticated())
+            auth -> auth.requestMatchers("/api/v1/users").permitAll().anyRequest().authenticated())
         .build();
   }
 }
