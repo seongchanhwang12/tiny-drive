@@ -13,6 +13,7 @@ plugins {
 }
 
 dependencies {
+
     runtimeOnly("com.mysql:mysql-connector-j")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -20,6 +21,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
+
+    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 }
 
 springBoot {
