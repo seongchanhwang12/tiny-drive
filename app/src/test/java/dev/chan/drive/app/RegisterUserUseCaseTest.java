@@ -1,16 +1,15 @@
 package dev.chan.drive.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
-import dev.chan.drive.domain.Drive;
-import dev.chan.drive.domain.DriveType;
-import dev.chan.drive.domain.DuplicateEmailException;
-import dev.chan.drive.domain.User;
+import dev.chan.drive.domain.*;
+import dev.chan.drive.errors.RestApiException;
+import dev.chan.drive.errors.CustomErrorCode;
 import dev.chan.drive.repository.DriveRepository;
 import dev.chan.drive.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @DisplayName("회원가입 유스케이스")
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +38,8 @@ class RegisterUserUseCaseTest {
   @Mock DriveRepository driveRepository;
 
   @Mock PasswordEncoder passwordEncoder;
+
+  @Mock PasswordPolicy passwordPolicy;
 
   @DisplayName("전달받은 값이 유효하면 회원가입에 성공하고 개인문서함 생성 요청을 수행한다")
   @Test
@@ -59,6 +61,7 @@ class RegisterUserUseCaseTest {
     assertThat(output.driveId()).isEqualTo(DRIVE_ID);
 
     then(userRepository).should().existsByEmail(VALID_EMAIL);
+    then(passwordPolicy).should().validate(VALID_PASSWORD);
     then(passwordEncoder).should().encode(VALID_PASSWORD);
     then(userRepository).should().save(any(User.class));
     then(driveRepository).should().save(any(Drive.class));
@@ -68,13 +71,15 @@ class RegisterUserUseCaseTest {
   @Test
   void fail_when_email_already_exists() {
     // given
-    RegisterUserUseCase.Input input = validInput();
+    final RegisterUserUseCase.Input input = validInput();
 
     given(userRepository.existsByEmail(input.email())).willReturn(true);
 
     // when & then
-    assertThatThrownBy(() -> registerUserUseCase.execute(input))
-        .isInstanceOf(DuplicateEmailException.class);
+    final RestApiException result =
+        assertThrows(RestApiException.class, () -> registerUserUseCase.execute(input));
+
+    assertThat(result.getErrorCode()).isEqualTo(CustomErrorCode.DUPLICATE_EMAIL);
 
     then(userRepository).should().existsByEmail(VALID_EMAIL);
     then(passwordEncoder).should(never()).encode(VALID_PASSWORD);
@@ -87,10 +92,14 @@ class RegisterUserUseCaseTest {
   }
 
   private User savedUser() {
-    return new User(USER_ID, VALID_EMAIL, ENCODED_PASSWORD);
+    User user = User.register(VALID_EMAIL, VALID_PASSWORD);
+    ReflectionTestUtils.setField(user, "id", 1L);
+    return user;
   }
 
   private Drive savedPersonalDrive() {
-    return Drive.builder().id(DRIVE_ID).userId(USER_ID).type(DriveType.PERSONAL).build();
+    Drive drive = Drive.builder().userId(USER_ID).type(DriveType.PERSONAL).build();
+    ReflectionTestUtils.setField(drive, "id", 10L);
+    return drive;
   }
 }

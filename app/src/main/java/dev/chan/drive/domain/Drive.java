@@ -1,9 +1,6 @@
 package dev.chan.drive.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -12,20 +9,24 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Table(
+    name = "drive",
+    uniqueConstraints = {@UniqueConstraint(name = "uk_user_id", columnNames = "user_id")})
 public class Drive extends Common {
   private static final long GB = 1024L * 1024L * 1024L;
   private static final long DEFAULT_QUOTA_BYTES = 50 * GB;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
+  @Column(nullable = false, unique = true)
   private long userId;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 30)
   private DriveType type;
+
   private long usedBytes;
   private long quotaBytes;
 
   public static Drive personal(long userId) {
-    return new Drive(null, userId, DriveType.PERSONAL, 0L, DEFAULT_QUOTA_BYTES);
+    return new Drive(userId, DriveType.PERSONAL, 0L, DEFAULT_QUOTA_BYTES);
   }
 }

@@ -1,10 +1,14 @@
 package dev.chan.drive.app;
 
 import dev.chan.drive.domain.Drive;
-import dev.chan.drive.domain.DuplicateEmailException;
+import dev.chan.drive.domain.PasswordPolicy;
 import dev.chan.drive.domain.User;
+import dev.chan.drive.errors.RestApiException;
+import dev.chan.drive.errors.CustomErrorCode;
 import dev.chan.drive.repository.DriveRepository;
 import dev.chan.drive.repository.UserRepository;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,8 +23,12 @@ public class RegisterUserUseCase {
   private final UserRepository userRepository;
   private final DriveRepository driveRepository;
   private final PasswordEncoder passwordEncoder;
+  private final PasswordPolicy passwordPolicy;
 
-  public record Input(String email, String pw) {}
+  public record Input(
+      @NotBlank(message = "Email is required") @Email(message = "Invalid email format")
+          String email,
+      @NotBlank(message = "Password is required") String pw) {}
 
   public record Output(long driveId, long userId, String email) {
     public static Output of(User user, Drive drive) {
@@ -29,20 +37,24 @@ public class RegisterUserUseCase {
   }
 
   @Transactional
-  public Output execute(Input input) {
-    log.info("User signup requested. email={}", input.email());
+  public Output execute(final Input input) {
+    log.info("User signup requested. email={}", input.email);
+    final String rawPassword = input.pw;
+    final String email = input.email;
 
-    if (userRepository.existsByEmail(input.email())) {
-      log.warn("User signup rejected. reason=duplicate_email email={}", input.email());
-      throw new DuplicateEmailException("Email already exists");
+    if (userRepository.existsByEmail(email)) {
+      log.warn("User signup rejected. reason=duplicate_email email={}", email);
+      throw new RestApiException(CustomErrorCode.DUPLICATE_EMAIL);
     }
 
-    String encodedPw = passwordEncoder.encode(input.pw);
-    User newUser = User.register(input.email(), encodedPw);
-    User savedUser = userRepository.save(newUser);
+    passwordPolicy.validate(rawPassword);
 
-    Drive personal = Drive.personal(savedUser.getId());
-    Drive savedDrive = driveRepository.save(personal);
+    final String encodedPassword = passwordEncoder.encode(rawPassword);
+    final User newUser = User.register(email, encodedPassword);
+    final User savedUser = userRepository.save(newUser);
+
+    final Drive personal = Drive.personal(savedUser.getId());
+    final Drive savedDrive = driveRepository.save(personal);
 
     log.info(
         "User signup completed. userId={} driveId={} email={}",

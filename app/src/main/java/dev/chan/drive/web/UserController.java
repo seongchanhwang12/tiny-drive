@@ -1,6 +1,7 @@
 package dev.chan.drive.web;
 
 import dev.chan.drive.app.RegisterUserUseCase;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,7 @@ public class UserController {
   private final RegisterUserUseCase registerUserUseCase;
 
   @PostMapping("/users")
-  public ResponseEntity<?> registerUser(@RequestBody RegisterUserUseCase.Input input) {
-    RegisterUserUseCase.Output output = registerUserUseCase.execute(input);
-    return ResponseEntity.status(HttpStatus.CREATED).body(output);
+  public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserUseCase.Input input) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(registerUserUseCase.execute(input));
   }
 }
