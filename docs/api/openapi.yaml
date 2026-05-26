@@ -10,7 +10,7 @@ servers:
     description: Local development server
 
 security:
-  - BearerAuth: []
+  - BearerAuth: [ ]
 
 tags:
   - name: Users
@@ -31,7 +31,7 @@ paths:
         - Users
       summary: 회원 가입
       operationId: join
-      security: []
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -54,7 +54,7 @@ paths:
         - Auth
       summary: 로그인
       operationId: login
-      security: []
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -281,7 +281,7 @@ components:
           type: string
           format: email
           example: test@drive.com
-        password:
+        pw:
           type: string
           format: password
           minLength: 8
@@ -291,16 +291,12 @@ components:
       type: object
       required:
         - userId
-        - name
         - email
       properties:
         userId:
           type: integer
           format: int64
           example: 1
-        name:
-          type: string
-          example: 김드라이브
         email:
           type: string
           format: email
@@ -374,7 +370,7 @@ components:
           items:
             type: integer
             format: int64
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         targetParentId:
           type: integer
           format: int64
@@ -392,7 +388,7 @@ components:
           items:
             type: integer
             format: int64
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
 
     RestoreItemsRequest:
       type: object
@@ -405,7 +401,7 @@ components:
           items:
             type: integer
             format: int64
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
 
     DeleteItemsRequest:
       type: object
@@ -418,7 +414,7 @@ components:
           items:
             type: integer
             format: int64
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
 
     ListItemsResponse:
       type: object
@@ -544,7 +540,6 @@ components:
       type: object
       required:
         - userId
-        - name
       properties:
         userId:
           type: integer

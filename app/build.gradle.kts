@@ -8,9 +8,24 @@
 
 plugins {
     id("drive.spring-web")
+    id("drive.spring-jpa")
+    id("drive.lombok")
 }
 
-dependencies {}
+dependencies {
+
+    runtimeOnly("com.mysql:mysql-connector-j")
+
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mysql")
+
+    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+}
 
 springBoot {
     mainClass.set("dev.chan.drive.TinyDriveApplication")
