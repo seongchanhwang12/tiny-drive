@@ -1,4 +1,4 @@
-package dev.chan.drive.common.config;
+package dev.chan.drive.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

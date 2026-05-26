@@ -1,4 +1,4 @@
-package dev.chan.drive.common.errors;
+package dev.chan.drive.error;
 
 import lombok.Getter;
 

@@ -8,10 +8,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.chan.drive.common.errors.RestApiException;
-import dev.chan.drive.common.errors.GlobalExceptionHandler;
-import dev.chan.drive.common.errors.CommonErrorCode;
-import dev.chan.drive.common.errors.CustomErrorCode;
+import dev.chan.drive.app.user.RegisterUserUseCase;
+import dev.chan.drive.app.user.UserController;
+import dev.chan.drive.error.RestApiException;
+import dev.chan.drive.error.GlobalExceptionHandler;
+import dev.chan.drive.error.CommonErrorCode;
+import dev.chan.drive.error.CustomErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

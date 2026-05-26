@@ -1,4 +1,4 @@
-package dev.chan.drive.user;
+package dev.chan.drive.app.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

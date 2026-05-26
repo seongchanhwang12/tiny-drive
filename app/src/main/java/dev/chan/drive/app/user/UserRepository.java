@@ -1,4 +1,4 @@
-package dev.chan.drive.user;
+package dev.chan.drive.app.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

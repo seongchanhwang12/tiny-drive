@@ -1,4 +1,4 @@
-package dev.chan.drive.common;
+package dev.chan.drive.app.common;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,7 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 @Getter
 @MappedSuperclass
-public abstract class Common {
+public abstract class BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

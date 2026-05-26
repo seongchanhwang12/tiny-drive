@@ -1,6 +1,6 @@
-package dev.chan.drive.user;
+package dev.chan.drive.app.user;
 
-import dev.chan.drive.common.Common;
+import dev.chan.drive.app.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +11,7 @@ import lombok.*;
 @Table(
     name = "users",
     uniqueConstraints = {@UniqueConstraint(name = "uk_user_email", columnNames = "email")})
-public class User extends Common {
+public class User extends BaseEntity {
 
   @Column(nullable = false, unique = true)
   private String email;

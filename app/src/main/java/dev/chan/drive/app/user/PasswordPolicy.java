@@ -1,7 +1,7 @@
-package dev.chan.drive.user;
+package dev.chan.drive.app.user;
 
-import dev.chan.drive.common.errors.RestApiException;
-import dev.chan.drive.common.errors.CustomErrorCode;
+import dev.chan.drive.error.RestApiException;
+import dev.chan.drive.error.CustomErrorCode;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,6 +1,6 @@
-package dev.chan.drive.drive;
+package dev.chan.drive.app.drive;
 
-import dev.chan.drive.common.Common;
+import dev.chan.drive.app.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +12,7 @@ import lombok.*;
 @Table(
     name = "drive",
     uniqueConstraints = {@UniqueConstraint(name = "uk_user_id", columnNames = "user_id")})
-public class Drive extends Common {
+public class Drive extends BaseEntity {
   private static final long GB = 1024L * 1024L * 1024L;
   private static final long DEFAULT_QUOTA_BYTES = 50 * GB;
 
