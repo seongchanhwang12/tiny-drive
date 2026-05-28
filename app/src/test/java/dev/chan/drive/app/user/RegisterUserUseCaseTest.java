@@ -1,4 +1,4 @@
-package dev.chan.drive.user;
+package dev.chan.drive.app.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -9,10 +9,6 @@ import static org.mockito.Mockito.never;
 
 import dev.chan.drive.app.drive.Drive;
 import dev.chan.drive.app.drive.DriveType;
-import dev.chan.drive.app.user.PasswordPolicy;
-import dev.chan.drive.app.user.RegisterUserUseCase;
-import dev.chan.drive.app.user.User;
-import dev.chan.drive.app.user.UserRepository;
 import dev.chan.drive.error.RestApiException;
 import dev.chan.drive.error.CustomErrorCode;
 import dev.chan.drive.app.drive.DriveRepository;

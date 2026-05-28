@@ -1,8 +1,7 @@
-package dev.chan.drive.drive;
+package dev.chan.drive.app.drive;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dev.chan.drive.app.drive.Drive;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

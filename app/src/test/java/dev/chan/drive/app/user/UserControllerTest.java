@@ -1,4 +1,4 @@
-package dev.chan.drive.user;
+package dev.chan.drive.app.user;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -8,8 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.chan.drive.app.user.RegisterUserUseCase;
-import dev.chan.drive.app.user.UserController;
 import dev.chan.drive.error.RestApiException;
 import dev.chan.drive.error.GlobalExceptionHandler;
 import dev.chan.drive.error.CommonErrorCode;

@@ -1,10 +1,9 @@
-package dev.chan.drive.user;
+package dev.chan.drive.app.user;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.*;
 
-import dev.chan.drive.app.user.PasswordPolicy;
 import dev.chan.drive.error.CustomErrorCode;
 import dev.chan.drive.error.RestApiException;
 import org.junit.jupiter.api.Test;

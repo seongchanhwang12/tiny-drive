@@ -16,7 +16,12 @@ dependencies {
 
     runtimeOnly("com.mysql:mysql-connector-j")
 
+    implementation("io.jsonwebtoken:jjwt-api:0.12.7")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.7")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.7")
+    
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
