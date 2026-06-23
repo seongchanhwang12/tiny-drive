@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.chan.drive.error.RestApiException;
+import dev.chan.drive.error.ApiException;
 import dev.chan.drive.error.GlobalExceptionHandler;
 import dev.chan.drive.error.CommonErrorCode;
 import dev.chan.drive.error.CustomErrorCode;
@@ -96,7 +96,7 @@ class UserControllerTest {
     RegisterUserUseCase.Input request =
         new RegisterUserUseCase.Input("valid@email.com", invalidPassword);
 
-    willThrow(new RestApiException(CustomErrorCode.INVALID_PASSWORD))
+    willThrow(new ApiException(CustomErrorCode.INVALID_PASSWORD))
         .given(registerUserUseCase)
         .execute(any(RegisterUserUseCase.Input.class));
 

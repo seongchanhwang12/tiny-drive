@@ -1,12 +1,11 @@
 package dev.chan.drive.config;
 
 import io.jsonwebtoken.security.Keys;
+import java.util.Base64;
+import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 
 @Configuration
 @RequiredArgsConstructor
@@ -15,6 +14,6 @@ public class JwtConfig {
 
   @Bean
   SecretKey secretKey() {
-    return Keys.hmacShaKeyFor(properties.secret().getBytes(StandardCharsets.UTF_8));
+    return Keys.hmacShaKeyFor(Base64.getDecoder().decode(properties.secret()));
   }
 }

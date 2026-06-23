@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.*;
 
 import dev.chan.drive.error.CustomErrorCode;
-import dev.chan.drive.error.RestApiException;
+import dev.chan.drive.error.ApiException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -19,8 +19,7 @@ class PasswordPolicyTest {
   @NullAndEmptySource
   @ValueSource(strings = {"invalid"})
   void validate_fail(String rawPassword) {
-    RestApiException result =
-        assertThrows(RestApiException.class, () -> policy.validate(rawPassword));
+    ApiException result = assertThrows(ApiException.class, () -> policy.validate(rawPassword));
 
     assertThat(result.getErrorCode()).isEqualTo(CustomErrorCode.INVALID_PASSWORD);
   }

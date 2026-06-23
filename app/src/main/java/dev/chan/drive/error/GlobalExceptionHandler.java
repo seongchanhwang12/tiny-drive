@@ -27,8 +27,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return handleErrorResponse(ex, CommonErrorCode.INVALID_PARAM);
   }
 
-  @ExceptionHandler(RestApiException.class)
-  protected ResponseEntity<Object> handleApiException(final RestApiException ex) {
+  @ExceptionHandler(ApiException.class)
+  protected ResponseEntity<Object> handleApiException(final ApiException ex) {
     log.warn(
         "Handled API exception. code={}, message={}", ex.getErrorCode().name(), ex.getMessage());
     return handleErrorResponse(ex.getErrorCode());

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local
+    active: local, test
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -16,5 +16,20 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET}
+  issuer: tiny-drive
+  access-token-ttl: 30m
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
 ---
-spring.config.activate.on-profile: local, test
+spring:
+  config:
+    activate:
+      on-profile: test
+jwt:
+  secret: 0zgxf/91cPc9P8pzfWrFgqAAkZHAXm1p9AAdPraPicx1Lv6085fUtrldJ7wgBSEuOkXh79U3R36owHipKAHYrw==
+  issuer: tiny-drive
+  access-token-ttl: 30m

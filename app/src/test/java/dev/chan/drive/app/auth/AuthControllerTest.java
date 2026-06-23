@@ -1,6 +1,5 @@
 package dev.chan.drive.app.auth;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -11,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.chan.drive.error.CustomErrorCode;
 import dev.chan.drive.error.GlobalExceptionHandler;
-import dev.chan.drive.error.RestApiException;
+import dev.chan.drive.error.ApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -111,7 +110,7 @@ class AuthControllerTest {
     final String password = "Password123!";
 
     given(loginUseCase.execute(any(LoginUseCase.Input.class)))
-        .willThrow(new RestApiException(CustomErrorCode.INVALID_CREDENTIALS));
+        .willThrow(new ApiException(CustomErrorCode.INVALID_CREDENTIALS));
 
     mockMvc
         .perform(

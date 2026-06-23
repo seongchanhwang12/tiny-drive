@@ -9,7 +9,7 @@ import static org.mockito.Mockito.never;
 
 import dev.chan.drive.app.drive.Drive;
 import dev.chan.drive.app.drive.DriveType;
-import dev.chan.drive.error.RestApiException;
+import dev.chan.drive.error.ApiException;
 import dev.chan.drive.error.CustomErrorCode;
 import dev.chan.drive.app.drive.DriveRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -76,8 +76,8 @@ class RegisterUserUseCaseTest {
     given(userRepository.existsByEmail(input.email())).willReturn(true);
 
     // when & then
-    final RestApiException result =
-        assertThrows(RestApiException.class, () -> registerUserUseCase.execute(input));
+    final ApiException result =
+        assertThrows(ApiException.class, () -> registerUserUseCase.execute(input));
 
     assertThat(result.getErrorCode()).isEqualTo(CustomErrorCode.DUPLICATE_EMAIL);
 
