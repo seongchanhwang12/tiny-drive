@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -98,9 +99,9 @@ class JwtAuthenticationFilterTest {
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
   }
-
   /*
   @Autowired FilterChainProxy filterChainProxy;
+
   @Test
   void 필터_순서_확인() {
 
@@ -110,6 +111,5 @@ class JwtAuthenticationFilterTest {
             chain -> {
               chain.getFilters().forEach(filter -> System.out.println(filter.getClass().getName()));
             });
-  }
-  */
+  }*/
 }
