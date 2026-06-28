@@ -1,7 +1,7 @@
 package dev.chan.drive.app.user;
 
 import dev.chan.drive.app.drive.Drive;
-import dev.chan.drive.error.RestApiException;
+import dev.chan.drive.error.ApiException;
 import dev.chan.drive.error.CustomErrorCode;
 import dev.chan.drive.app.drive.DriveRepository;
 import jakarta.validation.constraints.Email;
@@ -41,7 +41,7 @@ public class RegisterUserUseCase {
 
     if (userRepository.existsByEmail(email)) {
       log.warn("User signup rejected. reason=duplicate_email email={}", email);
-      throw new RestApiException(CustomErrorCode.DUPLICATE_EMAIL);
+      throw new ApiException(CustomErrorCode.DUPLICATE_EMAIL);
     }
 
     passwordPolicy.validate(rawPassword);

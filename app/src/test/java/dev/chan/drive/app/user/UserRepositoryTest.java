@@ -1,9 +1,7 @@
-package dev.chan.drive.user;
+package dev.chan.drive.app.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dev.chan.drive.app.user.User;
-import dev.chan.drive.app.user.UserRepository;
 import dev.chan.drive.config.MySqlTestcontainersConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

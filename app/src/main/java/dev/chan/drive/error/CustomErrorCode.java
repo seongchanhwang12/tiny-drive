@@ -13,6 +13,9 @@ public enum CustomErrorCode implements ErrorCode {
   /* User */
   DUPLICATE_EMAIL(HttpStatus.CONFLICT, "Duplicate email address."),
   INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "Invalid password format."),
+  INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Invalid credentials."),
+  UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Unauthorized"),
+  INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid token."),
   ;
 
   private final HttpStatus httpStatus;

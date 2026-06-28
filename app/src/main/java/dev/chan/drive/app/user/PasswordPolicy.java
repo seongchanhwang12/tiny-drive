@@ -1,6 +1,6 @@
 package dev.chan.drive.app.user;
 
-import dev.chan.drive.error.RestApiException;
+import dev.chan.drive.error.ApiException;
 import dev.chan.drive.error.CustomErrorCode;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,7 @@ public class PasswordPolicy {
         || !containsUppercase(pw)
         || !containsSpecialCharacter(pw)) {
 
-      throw new RestApiException(CustomErrorCode.INVALID_PASSWORD);
+      throw new ApiException(CustomErrorCode.INVALID_PASSWORD);
     }
   }
 
