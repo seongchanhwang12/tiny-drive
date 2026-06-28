@@ -20,12 +20,10 @@ public class LoginUseCase {
   private final UserRepository userRepository;
   private final JwtTokenProvider tokenProvider;
 
-  public record Input(@NotBlank @Email String email, @NotBlank String pw) {}
-
-  public record Output(String accessToken) {}
+  public record Input(@NotEmpty @Email String email, @NotBlank String pw) {}
 
   @Transactional(readOnly = true)
-  public Output execute(final Input input) {
+  public AccessToken execute(final Input input) {
     final String rawPw = input.pw;
 
     final User user =
@@ -34,7 +32,7 @@ public class LoginUseCase {
             .filter(u -> passwordEncoder.matches(rawPw, u.getPw()))
             .orElseThrow(() -> new ApiException(CustomErrorCode.INVALID_CREDENTIALS));
 
-    JwtPrincipal principal = JwtPrincipal.from(user);
-    return new Output(tokenProvider.issue(principal));
+    Principal principal = Principal.from(user);
+    return tokenProvider.issue(principal);
   }
 }

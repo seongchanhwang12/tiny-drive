@@ -29,6 +29,7 @@ spring:
   config:
     activate:
       on-profile: test
+
 jwt:
   secret: 0zgxf/91cPc9P8pzfWrFgqAAkZHAXm1p9AAdPraPicx1Lv6085fUtrldJ7wgBSEuOkXh79U3R36owHipKAHYrw==
   issuer: tiny-drive

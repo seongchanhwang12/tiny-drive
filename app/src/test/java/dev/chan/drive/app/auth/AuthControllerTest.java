@@ -25,10 +25,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import java.time.Duration;
+
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
   private MockMvc mockMvc;
+  private static final String VALID_EMAIL = "email@chandev.de";
+  private static final String VALID_PASSWORD = "Password123!";
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
   @InjectMocks private AuthController authController;
   @Mock LoginUseCase loginUseCase;
@@ -42,16 +47,11 @@ class AuthControllerTest {
             .build();
   }
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
-
   @Test
   void 유효한_로그인요청을_받으면_로그인에_성공한다() throws Exception {
     // given
-    final String email = "test@example.com";
-    final String password = "Password123!";
-
-    final LoginUseCase.Input input = new LoginUseCase.Input(email, password);
-    final LoginUseCase.Output output = new LoginUseCase.Output("token");
+    final LoginUseCase.Input input = new LoginUseCase.Input(VALID_EMAIL, VALID_PASSWORD);
+    final AccessToken output = new AccessToken("token", "bearer", 1800L);
 
     given(loginUseCase.execute(any())).willReturn(output);
 
@@ -62,7 +62,9 @@ class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(input)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.accessToken").value("token"));
+        .andExpect(jsonPath("$.value").value("token"))
+        .andExpect(jsonPath("$.expiresIn").value(1800L))
+        .andExpect(jsonPath("$.type").value("bearer"));
 
     then(loginUseCase).should().execute(any(LoginUseCase.Input.class));
   }
@@ -70,9 +72,9 @@ class AuthControllerTest {
   @ParameterizedTest
   @NullAndEmptySource
   @ValueSource(strings = {" ", "   ", "\t", "\n"})
-  void email이_비어있으면_400을_반환한다(String email) throws Exception {
+  void email이_비어있으면_400을_반환한다(String invalidEmail) throws Exception {
     // given
-    final LoginUseCase.Input input = new LoginUseCase.Input(email, "Password123!");
+    final LoginUseCase.Input input = new LoginUseCase.Input(invalidEmail, VALID_PASSWORD);
 
     // when & then
     mockMvc
@@ -88,10 +90,10 @@ class AuthControllerTest {
   @ParameterizedTest
   @NullAndEmptySource
   @ValueSource(strings = {" ", "   ", "\t", "\n"})
-  void pw가_비어있으면_400을_반환한다(String pw) throws Exception {
+  void pw가_비어있으면_400을_반환한다(String invalidPassword) throws Exception {
 
     // given
-    final LoginUseCase.Input input = new LoginUseCase.Input("email@test.com", pw);
+    final LoginUseCase.Input input = new LoginUseCase.Input(VALID_EMAIL, invalidPassword);
 
     // when & then
     mockMvc
@@ -106,8 +108,6 @@ class AuthControllerTest {
 
   @Test
   void 인증정보가_올바르지_않으면_401을_반환한다() throws Exception {
-    final String email = "test@example.com";
-    final String password = "Password123!";
 
     given(loginUseCase.execute(any(LoginUseCase.Input.class)))
         .willThrow(new ApiException(CustomErrorCode.INVALID_CREDENTIALS));
@@ -116,7 +116,9 @@ class AuthControllerTest {
         .perform(
             post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new LoginUseCase.Input(email, password))))
+                .content(
+                    objectMapper.writeValueAsString(
+                        new LoginUseCase.Input(VALID_EMAIL, VALID_PASSWORD))))
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.code").value(CustomErrorCode.INVALID_CREDENTIALS.name()));
   }

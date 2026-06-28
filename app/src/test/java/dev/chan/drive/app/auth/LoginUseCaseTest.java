@@ -23,6 +23,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class LoginUseCaseTest {
 
+  private static final String EMAIL = "email@email.com";
+  private static final String RAW_PASSWORD = "email@email.com";
+  private static final String ENCODED_PASSWORD = "encoded-password";
+
   @InjectMocks LoginUseCase sut;
   @Mock PasswordEncoder passwordEncoder;
   @Mock UserRepository userRepository;
@@ -31,18 +35,15 @@ class LoginUseCaseTest {
   @Test
   void 비밀번호가_일치하지_않으면_로그인에_실패한다() {
     // given
-    String email = "test@test.com";
-    String rawPw = "Password1!";
-    String encodedPw = "encoded-password";
+    final User user = User.register(EMAIL, ENCODED_PASSWORD);
 
-    User user = User.register(email, encodedPw);
-
-    given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
-    given(passwordEncoder.matches(rawPw, encodedPw)).willReturn(false);
+    given(userRepository.findByEmail(EMAIL)).willReturn(Optional.of(user));
+    given(passwordEncoder.matches(RAW_PASSWORD, ENCODED_PASSWORD)).willReturn(false);
 
     // when
-    ApiException result =
-        assertThrows(ApiException.class, () -> sut.execute(new LoginUseCase.Input(email, rawPw)));
+    final ApiException result =
+        assertThrows(
+            ApiException.class, () -> sut.execute(new LoginUseCase.Input(EMAIL, RAW_PASSWORD)));
 
     // then
     assertThat(result.getErrorCode()).isEqualTo(CustomErrorCode.INVALID_CREDENTIALS);
@@ -51,14 +52,12 @@ class LoginUseCaseTest {
   @Test
   void 사용자가_없으면_로그인에_실패한다() {
     // given
-    String email = "test@test.com";
-    String rawPw = "Password1!";
-
-    given(userRepository.findByEmail(email)).willReturn(Optional.empty());
+    given(userRepository.findByEmail(EMAIL)).willReturn(Optional.empty());
 
     // when
-    ApiException result =
-        assertThrows(ApiException.class, () -> sut.execute(new LoginUseCase.Input(email, rawPw)));
+    final ApiException result =
+        assertThrows(
+            ApiException.class, () -> sut.execute(new LoginUseCase.Input(EMAIL, RAW_PASSWORD)));
 
     // then
     assertThat(result.getErrorCode()).isEqualTo(CustomErrorCode.INVALID_CREDENTIALS);
@@ -67,27 +66,24 @@ class LoginUseCaseTest {
   @Test
   void 로그인_성공() {
     // given
-    String email = "test@test.com";
-    String rawPw = "Password1!";
-    String encodedPw = "encoded-password";
-
-    User user = User.register(email, encodedPw);
+    final User user = User.register(EMAIL, ENCODED_PASSWORD);
     ReflectionTestUtils.setField(user, "id", 1L);
 
-    JwtPrincipal principal = JwtPrincipal.from(user);
+    final Principal principal = Principal.from(user);
+    final AccessToken accessToken = new AccessToken("token", "bearer", 1800L);
 
     given(userRepository.findByEmail(anyString())).willReturn(Optional.of(user));
-    given(passwordEncoder.matches(rawPw, encodedPw)).willReturn(true);
-    given(tokenProvider.issue(principal)).willReturn("token");
+    given(passwordEncoder.matches(RAW_PASSWORD, ENCODED_PASSWORD)).willReturn(true);
+    given(tokenProvider.issue(principal)).willReturn(accessToken);
 
     // when
-    LoginUseCase.Output result = sut.execute(new LoginUseCase.Input(email, rawPw));
+    AccessToken result = sut.execute(new LoginUseCase.Input(EMAIL, RAW_PASSWORD));
 
     // then
-    assertThat(result.accessToken()).isEqualTo("token");
-    then(userRepository).should().findByEmail(email);
+    assertThat(result.value()).isEqualTo("token");
+    then(userRepository).should().findByEmail(EMAIL);
 
-    then(passwordEncoder).should().matches(rawPw, encodedPw);
+    then(passwordEncoder).should().matches(RAW_PASSWORD, ENCODED_PASSWORD);
     then(tokenProvider).should().issue(principal);
   }
 }

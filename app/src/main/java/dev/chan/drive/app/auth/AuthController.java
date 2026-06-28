@@ -18,7 +18,7 @@ public class AuthController {
   private final LoginUseCase loginUseCase;
 
   @PostMapping("/login")
-  public ResponseEntity<Object> login(@Valid @RequestBody LoginUseCase.Input input) {
+  public ResponseEntity<AccessToken> login(@Valid @RequestBody LoginUseCase.Input input) {
     return ResponseEntity.ok(loginUseCase.execute(input));
   }
 }

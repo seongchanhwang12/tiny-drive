@@ -1,8 +1,7 @@
 package dev.chan.drive.config;
 
-import dev.chan.drive.app.auth.JwtPrincipal;
-import dev.chan.drive.error.CustomErrorCode;
-import dev.chan.drive.error.ApiException;
+import dev.chan.drive.app.auth.AccessToken;
+import dev.chan.drive.app.auth.Principal;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.sql.Date;
@@ -19,30 +18,34 @@ public class JwtTokenProvider {
   private final SecretKey secretKey;
   private final JwtProperties jwtProperties;
 
-  public String issue(JwtPrincipal principal) {
-    Instant now = Instant.now();
+  public AccessToken issue(final Principal principal) {
+    final Instant now = Instant.now();
+    final long expireSeconds = jwtProperties.accessTokenTtl().getSeconds();
 
-    return Jwts.builder()
-        .issuer(jwtProperties.issuer())
-        .subject(principal.getSubject())
-        .issuedAt(Date.from(now))
-        .expiration(Date.from(now.plus(jwtProperties.accessTokenTtl())))
-        .signWith(secretKey)
-        .compact();
+    final String value =
+        Jwts.builder()
+            .issuer(jwtProperties.issuer())
+            .subject(principal.getSubject())
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(now.plusSeconds(expireSeconds)))
+            .signWith(secretKey)
+            .compact();
+
+    return new AccessToken(value, "Bearer", expireSeconds);
   }
 
-  public JwtPrincipal extractPrincipal(String token) {
+  public Principal extractPrincipal(String token) {
     try {
       String subject =
           Jwts.parser()
               .verifyWith(secretKey)
-              .requireIssuer("tiny-drive")
+              .requireIssuer(jwtProperties.issuer())
               .build()
               .parseSignedClaims(token)
               .getPayload()
               .getSubject();
 
-      return new JwtPrincipal(Long.valueOf(subject));
+      return new Principal(Long.valueOf(subject));
     } catch (JwtException | IllegalArgumentException e) {
       throw new BadCredentialsException("Invalid token", e);
     }

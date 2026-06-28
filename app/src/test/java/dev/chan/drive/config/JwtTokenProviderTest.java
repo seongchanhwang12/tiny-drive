@@ -1,10 +1,7 @@
 package dev.chan.drive.config;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import dev.chan.drive.app.auth.JwtPrincipal;
-import dev.chan.drive.error.ApiException;
+import dev.chan.drive.app.auth.AccessToken;
+import dev.chan.drive.app.auth.Principal;
 import io.jsonwebtoken.Jwts;
 import javax.crypto.SecretKey;
 
@@ -13,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.core.AuthenticationException;
 
 import java.time.Duration;
+
+import static org.assertj.core.api.Assertions.*;
 
 class JwtTokenProviderTest {
 
@@ -31,24 +30,28 @@ class JwtTokenProviderTest {
   void 토큰을_정상적으로_발급한다() {
     // given
     Long userId = 1L;
-    JwtPrincipal principal = new JwtPrincipal(userId);
+    Principal principal = new Principal(userId);
 
     // when
-    String token = sut.issue(principal);
+    AccessToken token = sut.issue(principal);
+    Principal extracted = sut.extractPrincipal(token.value());
 
     // then
-    assertThat(token).isNotBlank();
+    assertThat(token.value()).isNotBlank();
+    assertThat(token.type()).isEqualTo("Bearer");
+    assertThat(token.expiresIn()).isEqualTo(1800L);
+    assertThat(extracted.userId()).isEqualTo(userId);
   }
 
   @Test
   void 토큰에서_subject를_추출한다() {
     // given
     Long userId = 1L;
-    JwtPrincipal principal = new JwtPrincipal(userId);
-    String token = sut.issue(principal);
+    Principal principal = new Principal(userId);
+    AccessToken issue = sut.issue(principal);
 
     // when
-    JwtPrincipal result = sut.extractPrincipal(token);
+    Principal result = sut.extractPrincipal(issue.value());
 
     // then
     assertThat(result.getSubject()).isEqualTo("1");
@@ -64,15 +67,15 @@ class JwtTokenProviderTest {
   void 다른_secretKey로_발급된_토큰은_검증에_실패한다() {
     // given
     Long userId = 1L;
-    JwtPrincipal principal = new JwtPrincipal(userId);
-    String token = sut.issue(principal);
+    Principal principal = new Principal(userId);
+    AccessToken issue = sut.issue(principal);
 
     // when
     SecretKey otherKey = Jwts.SIG.HS256.key().build();
     JwtTokenProvider otherIssuer = new JwtTokenProvider(otherKey, properties);
 
     // then
-    assertThatThrownBy(() -> otherIssuer.extractPrincipal(token))
+    assertThatThrownBy(() -> otherIssuer.extractPrincipal(issue.value()))
         .isInstanceOf(AuthenticationException.class);
   }
 }

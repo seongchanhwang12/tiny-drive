@@ -1,13 +1,13 @@
 package dev.chan.drive.security;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.chan.drive.app.auth.JwtPrincipal;
+import dev.chan.drive.app.auth.AccessToken;
+import dev.chan.drive.app.auth.Principal;
 import dev.chan.drive.app.auth.LoginUseCase;
 import dev.chan.drive.config.JwtTokenProvider;
 import dev.chan.drive.config.MySqlTestcontainersConfig;
@@ -18,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,10 +64,10 @@ class JwtAuthenticationFilterTest {
 
   @Test
   void 유효한_토큰이면_요청한_API_접근할_수_있다() throws Exception {
-    String token = jwtTokenProvider.issue(new JwtPrincipal(1L));
+    AccessToken token = jwtTokenProvider.issue(new Principal(1L));
 
     mockMvc
-        .perform(get("/api/test/protected").header("Authorization", "Bearer " + token))
+        .perform(get("/api/test/protected").header("Authorization", "Bearer " + token.value()))
         .andExpect(status().isOk());
   }
 
