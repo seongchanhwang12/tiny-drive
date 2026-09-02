@@ -10,7 +10,7 @@ servers:
     description: Local development server
 
 security:
-  - BearerAuth: []
+  - BearerAuth: [ ]
 
 tags:
   - name: Users
@@ -30,14 +30,45 @@ paths:
       tags:
         - Users
       summary: 회원 가입
+      description: |
+        새 사용자와 개인 드라이브를 생성합니다.
+        성공 응답을 확인하려면 이미 가입되지 않은 이메일로 요청해야 합니다.
+        같은 이메일로 다시 요청하면 `409 DUPLICATE_EMAIL`이 반환됩니다.
+
+        ```bash
+        curl --request POST 'http://localhost:8080/api/v1/users' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "email": "new-user-001@drive.com",
+            "pw": "Password123!"
+          }'
+        ```
       operationId: join
-      security: []
+      security: [ ]
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateUserRequest'
+            examples:
+              success:
+                summary: 회원가입 성공 요청
+                description: 실행 전에 사용된 적 없는 이메일로 변경하면 201 응답을 확인할 수 있습니다.
+                value:
+                  email: new-user-001@drive.com
+                  pw: Password123!
+              duplicateEmail:
+                summary: 회원가입 실패 요청 - 중복 이메일
+                description: 성공 요청을 한 번 실행한 뒤 같은 이메일로 다시 실행하면 409 응답을 확인할 수 있습니다.
+                value:
+                  email: new-user-001@drive.com
+                  pw: Password123!
+              validationFailure:
+                summary: 회원가입 실패 요청 - 잘못된 이메일
+                value:
+                  email: invalid-email
+                  pw: Password123!
       responses:
         '201':
           description: 회원가입 성공
@@ -45,22 +76,84 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
+              examples:
+                success:
+                  summary: 회원가입 성공 응답
+                  value:
+                    driveId: 1
+                    userId: 1
+                    email: new-user-001@drive.com
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: 회원가입 실패
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidParam:
+                  summary: 요청 검증 실패
+                  value:
+                    code: INVALID_PARAM
+                    message: Invalid parameter included
+                    errors:
+                      - field: email
+                        message: Invalid email format
+                invalidPassword:
+                  summary: 비밀번호 정책 위반
+                  value:
+                    code: INVALID_PASSWORD
+                    message: Invalid password format.
+                    errors: []
+        '409':
+          description: 이미 가입된 이메일
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateEmail:
+                  summary: 중복 이메일
+                  value:
+                    code: DUPLICATE_EMAIL
+                    message: Duplicate email address.
+                    errors: []
 
   /api/v1/auth/login:
     post:
       tags:
         - Auth
       summary: 로그인
+      description: |
+        이메일과 비밀번호로 로그인하고 access token을 발급받습니다.
+
+        ```bash
+        curl --request POST 'http://localhost:8080/api/v1/auth/login' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "email": "new-user-001@drive.com",
+            "pw": "Password123!"
+          }'
+        ```
       operationId: login
-      security: []
+      security: [ ]
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/LoginRequest'
+            examples:
+              success:
+                summary: 로그인 성공 요청
+                description: 먼저 동일한 이메일/비밀번호로 회원가입을 완료한 뒤 실행합니다.
+                value:
+                  email: new-user-001@drive.com
+                  pw: Password123!
+              failure:
+                summary: 로그인 실패 요청 - 잘못된 인증 정보
+                value:
+                  email: new-user-001@drive.com
+                  pw: WrongPassword123!
       responses:
         '200':
           description: 로그인 성공
@@ -68,8 +161,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
+              examples:
+                success:
+                  summary: 로그인 성공 응답
+                  value:
+                    value: eyJhbGciOiJIUzI1NiJ9...
+                    type: bearer
+                    expiresIn: 1800
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: 로그인 실패
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidCredentials:
+                  summary: 인증 정보 불일치
+                  value:
+                    code: INVALID_CREDENTIALS
+                    message: Invalid credentials.
+                    errors: []
 
   /api/v1/items:
     post:
@@ -270,37 +381,38 @@ components:
     CreateUserRequest:
       type: object
       required:
-        - name
         - email
-        - password
+        - pw
+      example:
+        email: new-user-001@drive.com
+        pw: Password123!
       properties:
-        name:
-          type: string
-          example: 김드라이브
         email:
           type: string
           format: email
-          example: test@drive.com
-        password:
+          example: new-user-001@drive.com
+        pw:
           type: string
           format: password
-          minLength: 8
-          example: password123!
+          minLength: 10
+          description: 최소 10자, 대문자와 특수문자를 포함해야 합니다.
+          example: Password123!
 
     UserResponse:
       type: object
       required:
+        - driveId
         - userId
-        - name
         - email
       properties:
+        driveId:
+          type: integer
+          format: int64
+          example: 1
         userId:
           type: integer
           format: int64
           example: 1
-        name:
-          type: string
-          example: 김드라이브
         email:
           type: string
           format: email
@@ -310,34 +422,35 @@ components:
       type: object
       required:
         - email
-        - password
+        - pw
       properties:
         email:
           type: string
           format: email
           example: test@drive.com
-        password:
+        pw:
           type: string
           format: password
-          example: password123!
+          minLength: 1
+          example: Password123!
 
     LoginResponse:
       type: object
       required:
-        - accessToken
-        - tokenType
+        - value
+        - type
         - expiresIn
       properties:
-        accessToken:
+        value:
           type: string
           example: eyJhbGciOiJIUzI1NiJ9...
-        tokenType:
+        type:
           type: string
-          example: Bearer
+          example: bearer
         expiresIn:
           type: integer
           format: int64
-          example: 3600
+          example: 1800
 
     CreateFolderRequest:
       type: object
@@ -374,7 +487,7 @@ components:
           items:
             type: integer
             format: int64
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
         targetParentId:
           type: integer
           format: int64
@@ -392,7 +505,7 @@ components:
           items:
             type: integer
             format: int64
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
 
     RestoreItemsRequest:
       type: object
@@ -405,7 +518,7 @@ components:
           items:
             type: integer
             format: int64
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
 
     DeleteItemsRequest:
       type: object
@@ -418,7 +531,7 @@ components:
           items:
             type: integer
             format: int64
-          example: [1, 2, 3]
+          example: [ 1, 2, 3 ]
 
     ListItemsResponse:
       type: object
@@ -544,7 +657,6 @@ components:
       type: object
       required:
         - userId
-        - name
       properties:
         userId:
           type: integer
@@ -574,16 +686,32 @@ components:
       required:
         - code
         - message
+        - errors
       properties:
         code:
           type: string
           example: INVALID_CREDENTIALS
         message:
           type: string
-          example: 이메일 또는 비밀번호가 올바르지 않습니다.
-        traceId:
+          example: Invalid credentials.
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldErrorResponse'
+          example: []
+
+    FieldErrorResponse:
+      type: object
+      required:
+        - field
+        - message
+      properties:
+        field:
           type: string
-          example: 01HXYZ...
+          example: email
+        message:
+          type: string
+          example: Invalid email format
 
   responses:
     BadRequest:

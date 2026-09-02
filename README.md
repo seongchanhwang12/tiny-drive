@@ -57,7 +57,7 @@ Tiny Drive는 Google Drive 스타일의 클라우드 기반 DMS(Document Managem
 - [API Spec](docs/api/openapi.yaml)
 - [ERD](docs/erd/erd-mvp.md)
 - [ADR](docs/adr)
-
+- [Requirements](docs/requirements/fr.md)
 ---
 
 ## Future Goals

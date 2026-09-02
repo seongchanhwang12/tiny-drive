@@ -7,3 +7,6 @@ build
 #.idea
 .idea/
 .DS_Store
+
+# 로컬 설정 제외
+application-local.yml
