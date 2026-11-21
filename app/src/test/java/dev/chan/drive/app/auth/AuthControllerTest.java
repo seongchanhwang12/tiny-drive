@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import java.time.Duration;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
@@ -48,14 +47,14 @@ class AuthControllerTest {
   }
 
   @Test
-  void 유효한_로그인요청을_받으면_로그인에_성공한다() throws Exception {
-    // given
+  void 유효한_로그인_요청이_주어지면_토큰을_응답한다() throws Exception {
+    // Given
     final LoginUseCase.Input input = new LoginUseCase.Input(VALID_EMAIL, VALID_PASSWORD);
     final AccessToken output = new AccessToken("token", "bearer", 1800L);
 
     given(loginUseCase.execute(any())).willReturn(output);
 
-    // when & then
+    // When / Then
     mockMvc
         .perform(
             post("/api/v1/auth/login")
@@ -72,11 +71,11 @@ class AuthControllerTest {
   @ParameterizedTest
   @NullAndEmptySource
   @ValueSource(strings = {" ", "   ", "\t", "\n"})
-  void email이_비어있으면_400을_반환한다(String invalidEmail) throws Exception {
-    // given
+  void 이메일이_비어있는_요청이_주어지면_400을_반환하고_유스케이스를_호출하지_않는다(String invalidEmail) throws Exception {
+    // Given
     final LoginUseCase.Input input = new LoginUseCase.Input(invalidEmail, VALID_PASSWORD);
 
-    // when & then
+    // When / Then
     mockMvc
         .perform(
             post("/api/v1/auth/login")
@@ -90,12 +89,11 @@ class AuthControllerTest {
   @ParameterizedTest
   @NullAndEmptySource
   @ValueSource(strings = {" ", "   ", "\t", "\n"})
-  void pw가_비어있으면_400을_반환한다(String invalidPassword) throws Exception {
-
-    // given
+  void 비밀번호가_비어있는_요청이_주어지면_400을_반환하고_유스케이스를_호출하지_않는다(String invalidPassword) throws Exception {
+    // Given
     final LoginUseCase.Input input = new LoginUseCase.Input(VALID_EMAIL, invalidPassword);
 
-    // when & then
+    // When / Then
     mockMvc
         .perform(
             post("/api/v1/auth/login")
@@ -108,10 +106,11 @@ class AuthControllerTest {
 
   @Test
   void 인증정보가_올바르지_않으면_401을_반환한다() throws Exception {
-
+    // Given
     given(loginUseCase.execute(any(LoginUseCase.Input.class)))
         .willThrow(new ApiException(CustomErrorCode.INVALID_CREDENTIALS));
 
+    // When / Then
     mockMvc
         .perform(
             post("/api/v1/auth/login")
