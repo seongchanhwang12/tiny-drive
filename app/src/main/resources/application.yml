@@ -7,9 +7,6 @@ spring:
     properties:
       hibernate.timezone.default_storage: NORMALIZE_UTC
       hibernate.jdbc.time_zone: UTC
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
     generate-ddl: true
     show-sql: false
@@ -24,6 +21,12 @@ logging:
     org:
       springframework:
         security: DEBUG
+
+storage:
+  upload:
+    max-file-size: 100MB
+    single-put-threshold: 100MB
+
 ---
 spring:
   config:
