@@ -19,7 +19,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.12.7")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.7")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.7")
-    
+
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
 
@@ -30,6 +30,16 @@ dependencies {
     testImplementation("org.testcontainers:mysql")
 
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+
+    val querydslVersion = "5.1.0"
+    implementation("com.querydsl:querydsl-jpa:$querydslVersion:jakarta")
+    annotationProcessor(
+        "com.querydsl:querydsl-apt:$querydslVersion:jakarta"
+    )
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+
+
 }
 
 springBoot {
