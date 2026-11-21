@@ -47,7 +47,8 @@ class JwtAuthenticationFilterTest {
   @Autowired MockMvc mockMvc;
 
   @Test
-  void 토큰이_없으면_401을_반환한다() throws Exception {
+  void 인증_토큰이_없는_요청이면_401을_반환한다() throws Exception {
+    // When / Then
     mockMvc
         .perform(get("/api/test/protected"))
         .andExpect(status().isUnauthorized())
@@ -55,24 +56,31 @@ class JwtAuthenticationFilterTest {
   }
 
   @Test
-  void 잘못된_토큰이면_401을_반환한다() throws Exception {
+  void 유효하지_않은_토큰이_주어지면_401을_반환한다() throws Exception {
+    // Given
+    String token = "Bearer invalid-token";
+
+    // When / Then
     mockMvc
-        .perform(get("/api/test/protected").header("Authorization", "Bearer invalid-token"))
+        .perform(get("/api/test/protected").header("Authorization", token))
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.code").value("INVALID_TOKEN"));
   }
 
   @Test
-  void 유효한_토큰이면_요청한_API_접근할_수_있다() throws Exception {
+  void 유효한_토큰이_주어지면_보호된_API에_접근할_수_있다() throws Exception {
+    // Given
     AccessToken token = jwtTokenProvider.issue(new Principal(1L));
 
+    // When / Then
     mockMvc
         .perform(get("/api/test/protected").header("Authorization", "Bearer " + token.value()))
         .andExpect(status().isOk());
   }
 
   @Test
-  void Bearer_접두사가_없으면_401을_반환한다() throws Exception {
+  void Bearer_접두사가_없는_토큰이면_401을_반환한다() throws Exception {
+    // When / Then
     mockMvc
         .perform(get("/api/test/protected").header("Authorization", "invalid-token"))
         .andExpect(status().isUnauthorized())
@@ -87,9 +95,11 @@ class JwtAuthenticationFilterTest {
    * <p>로그인 성공 여부는 검증하지 않는다.
    */
   @Test
-  void 공개_api는_토큰_없이_접근할_수_있다() throws Exception {
+  void 로그인_API는_토큰이_없어도_인증_필터를_통과한다() throws Exception {
+    // Given
     LoginUseCase.Input request = new LoginUseCase.Input("test@test.com", "Password1!");
 
+    // When / Then
     mockMvc
         .perform(
             post("/api/v1/auth/login")
@@ -98,17 +108,4 @@ class JwtAuthenticationFilterTest {
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
   }
-  /*
-  @Autowired FilterChainProxy filterChainProxy;
-
-  @Test
-  void 필터_순서_확인() {
-
-    filterChainProxy
-        .getFilterChains()
-        .forEach(
-            chain -> {
-              chain.getFilters().forEach(filter -> System.out.println(filter.getClass().getName()));
-            });
-  }*/
 }

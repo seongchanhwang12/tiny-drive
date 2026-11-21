@@ -47,8 +47,8 @@ class UserControllerTest {
   }
 
   @Test
-  void register_user() throws Exception {
-    // given
+  void 유효한_가입_요청이_주어지면_회원과_문서함_정보를_응답한다() throws Exception {
+    // Given
     RegisterUserUseCase.Input request =
         new RegisterUserUseCase.Input("test@example.com", "Password123!");
 
@@ -57,7 +57,7 @@ class UserControllerTest {
 
     given(registerUserUseCase.execute(any())).willReturn(response);
 
-    // when & then
+    // When / Then
     mockMvc
         .perform(
             post("/api/v1/users")
@@ -72,11 +72,11 @@ class UserControllerTest {
   @ParameterizedTest
   @NullAndEmptySource
   @ValueSource(strings = {"invalidMail.com", "invalid", "user@", "@gmail.com"})
-  void should_fail_when_email_is_invalid(String invalidEmail) throws Exception {
-    // given
+  void 유효하지_않은_이메일이_주어지면_400과_필드_오류를_응답한다(String invalidEmail) throws Exception {
+    // Given
     RegisterUserUseCase.Input request = new RegisterUserUseCase.Input(invalidEmail, "Password123!");
 
-    // when & then
+    // When / Then
     mockMvc
         .perform(
             post("/api/v1/users")
@@ -91,8 +91,8 @@ class UserControllerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"password1", "!", "P!1"})
-  void should_fail_when_password_is_invalid(String invalidPassword) throws Exception {
-    // given
+  void 비밀번호_정책을_위반한_가입_요청이_주어지면_400을_응답한다(String invalidPassword) throws Exception {
+    // Given
     RegisterUserUseCase.Input request =
         new RegisterUserUseCase.Input("valid@email.com", invalidPassword);
 
@@ -100,6 +100,7 @@ class UserControllerTest {
         .given(registerUserUseCase)
         .execute(any(RegisterUserUseCase.Input.class));
 
+    // When / Then
     mockMvc
         .perform(
             post("/api/v1/users")

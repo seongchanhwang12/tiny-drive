@@ -11,7 +11,8 @@ import org.springframework.security.core.AuthenticationException;
 
 import java.time.Duration;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JwtTokenProviderTest {
 
@@ -27,16 +28,16 @@ class JwtTokenProviderTest {
   }
 
   @Test
-  void 토큰을_정상적으로_발급한다() {
-    // given
+  void 유효한_주체가_주어지면_토큰을_발급하고_주체를_복원한다() {
+    // Given
     Long userId = 1L;
     Principal principal = new Principal(userId);
 
-    // when
+    // When
     AccessToken token = sut.issue(principal);
     Principal extracted = sut.extractPrincipal(token.value());
 
-    // then
+    // Then
     assertThat(token.value()).isNotBlank();
     assertThat(token.type()).isEqualTo("Bearer");
     assertThat(token.expiresIn()).isEqualTo(1800L);
@@ -44,37 +45,38 @@ class JwtTokenProviderTest {
   }
 
   @Test
-  void 토큰에서_subject를_추출한다() {
-    // given
+  void 발급된_토큰이_주어지면_subject를_추출한다() {
+    // Given
     Long userId = 1L;
     Principal principal = new Principal(userId);
     AccessToken issue = sut.issue(principal);
 
-    // when
+    // When
     Principal result = sut.extractPrincipal(issue.value());
 
-    // then
+    // Then
     assertThat(result.getSubject()).isEqualTo("1");
   }
 
   @Test
-  void 잘못된_토큰이면_subject_추출에_실패한다() {
+  void 유효하지_않은_토큰이_주어지면_주체_추출을_거부한다() {
+    // When / Then
     assertThatThrownBy(() -> sut.extractPrincipal("invalid-token"))
         .isInstanceOf(AuthenticationException.class);
   }
 
   @Test
-  void 다른_secretKey로_발급된_토큰은_검증에_실패한다() {
-    // given
+  void 다른_비밀키로_발급된_토큰이_주어지면_검증을_거부한다() {
+    // Given
     Long userId = 1L;
     Principal principal = new Principal(userId);
     AccessToken issue = sut.issue(principal);
 
-    // when
+    // When
     SecretKey otherKey = Jwts.SIG.HS256.key().build();
     JwtTokenProvider otherIssuer = new JwtTokenProvider(otherKey, properties);
 
-    // then
+    // Then
     assertThatThrownBy(() -> otherIssuer.extractPrincipal(issue.value()))
         .isInstanceOf(AuthenticationException.class);
   }
