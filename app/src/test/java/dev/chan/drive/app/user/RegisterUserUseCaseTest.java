@@ -98,7 +98,7 @@ class RegisterUserUseCaseTest {
   }
 
   private Drive savedPersonalDrive() {
-    Drive drive = Drive.builder().userId(USER_ID).type(DriveType.PERSONAL).build();
+    Drive drive = Drive.builder().ownerId(USER_ID).type(DriveType.PERSONAL).build();
     ReflectionTestUtils.setField(drive, "id", 10L);
     return drive;
   }
