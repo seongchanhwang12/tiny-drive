@@ -24,7 +24,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtTokenProvider jwtTokenProvider;
@@ -39,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
 
     try {
-      Optional<String> tokenOpt = jwtTokenResolver.extractAccessToken(request);
+      final Optional<String> tokenOpt = jwtTokenResolver.extractAccessToken(request);
       // 토큰이 비어있을 경우 permitAll 요청일 수 있므로 Authorization 필터에서 판단하도록 체인을 넘깁니다.
       if (tokenOpt.isEmpty()) {
         filterChain.doFilter(request, response);
@@ -60,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
-  public Authentication attemptAuthentication(String token) {
+  public Authentication attemptAuthentication(final String token) {
     //  편리하게 Authentication 을 사용하기 위해 따로 구현하지않고 UsernamePasswordAuthenticationToken 을 사용합니다.
     final Principal principal = jwtTokenProvider.extractPrincipal(token);
     return new UsernamePasswordAuthenticationToken(principal, null, List.of());

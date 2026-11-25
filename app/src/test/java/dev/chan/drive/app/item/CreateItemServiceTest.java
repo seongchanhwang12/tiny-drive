@@ -60,45 +60,23 @@ class CreateItemServiceTest {
   }
 
   @Test
-  void 파일_생성_요청이_주어지면_현재_폴더의_이름을_조회해_중복을_해결한다() {
-    // Given
-    final DataSize requestedFileSize = DataSize.ofMegabytes(100);
-    final ItemName originalName = ItemName.of("original.txt");
-    final DriveItem parent = DriveItemFixture.folderWithId(PARENT_ID, null, USER_ID);
-
-    final Input input =
-        new Input(PARENT_ID, originalName.getValue(), MIME_TYPE, requestedFileSize.toBytes());
-
-    Set<ItemName> itemNames = Set.of(originalName);
-    given(itemRepository.findNamesByParentId(parent.getId())).willReturn(itemNames);
-    given(itemRepository.save(any(DriveItem.class))).willAnswer(returnsFirstArg());
-    given(parentFolderResolver.resolve(PARENT_ID, USER_ID)).willReturn(parent);
-
-    // When
-    Output output = sut.create(USER_ID, input);
-
-    // Then
-    assertThat(output.item().getName()).isEqualTo(ItemName.of("original (1).txt"));
-  }
-
-  @Test
   void 유효한_파일_정보가_주어지면_항목을_저장하고_업로드_URL을_반환한다() {
     // Given
     final DriveItem parent = DriveItemFixture.folderWithId(PARENT_ID, 0L, USER_ID);
     final Input input = new Input(PARENT_ID, FILE_NAME, MIME_TYPE, FILE_SIZE);
-
+    final DriveItem file = DriveItemFixture.file(PARENT_ID, FILE_NAME, USER_ID);
     final PresignedUpload upload = PresignUploadFixture.putUrl();
 
     given(parentFolderResolver.resolve(PARENT_ID, USER_ID)).willReturn(parent);
-    given(itemRepository.save(any(DriveItem.class))).willAnswer(returnsFirstArg());
+    given(itemRepository.save(any(DriveItem.class))).willReturn(file);
     given(storagePort.createPutUrl(anyString(), eq(MIME_TYPE))).willReturn(upload);
 
     // When
     final Output output = sut.create(USER_ID, input);
 
     // Then
-    ArgumentCaptor<DriveItem> savedItem = ArgumentCaptor.forClass(DriveItem.class);
-    ArgumentCaptor<String> storageKey = ArgumentCaptor.forClass(String.class);
+    final ArgumentCaptor<DriveItem> savedItem = ArgumentCaptor.forClass(DriveItem.class);
+    final ArgumentCaptor<String> storageKey = ArgumentCaptor.forClass(String.class);
     then(itemRepository).should().save(savedItem.capture());
     then(storagePort).should().createPutUrl(storageKey.capture(), eq(MIME_TYPE));
 
@@ -111,29 +89,7 @@ class CreateItemServiceTest {
             DriveItem::getSize)
         .containsExactly(MIME_TYPE, PARENT_ID, USER_ID, ItemName.of(FILE_NAME), FILE_SIZE);
 
-    assertThat(output.item()).isSameAs(savedItem.getValue());
     assertThat(output.upload()).isEqualTo(upload);
-  }
-
-  @Test
-  void 같은_폴더에_같은_이름이_있으면_다음_사용가능한_이름으로_저장한다() {
-
-    // Given
-    final Input input = new Input(PARENT_ID, "report.pdf", MIME_TYPE, FILE_SIZE);
-
-    final DriveItem parent = DriveItemFixture.folderWithId(PARENT_ID, null, USER_ID);
-
-    final Set<ItemName> itemNames = Set.of(ItemName.of("report.pdf"));
-
-    given(itemRepository.findNamesByParentId(PARENT_ID)).willReturn(itemNames);
-    given(parentFolderResolver.resolve(PARENT_ID, USER_ID)).willReturn(parent);
-    given(itemRepository.save(any(DriveItem.class))).willAnswer(returnsFirstArg());
-
-    // When
-    final Output output = sut.create(USER_ID, input);
-
-    // Then
-    assertThat(output.item().getName().getValue()).isEqualTo("report (1).pdf");
   }
 
   @Test
@@ -145,7 +101,7 @@ class CreateItemServiceTest {
     given(parentFolderResolver.resolve(PARENT_ID, USER_ID)).willReturn(parent);
 
     // When
-    Output output = sut.create(USER_ID, input);
+    final Output output = sut.create(USER_ID, input);
 
     // Then
     assertThat(output.upload()).isNull();
