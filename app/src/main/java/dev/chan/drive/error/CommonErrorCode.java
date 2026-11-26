@@ -12,7 +12,7 @@ public enum CommonErrorCode implements ErrorCode {
   INVALID_PARAM(HttpStatus.BAD_REQUEST, "Invalid parameter included"),
   NOT_FOUND(HttpStatus.NOT_FOUND, "Resource not found."),
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error."),
-  ;
+  INVALID_STATE(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid state");
   private final HttpStatus httpStatus;
   private final String message;
 }

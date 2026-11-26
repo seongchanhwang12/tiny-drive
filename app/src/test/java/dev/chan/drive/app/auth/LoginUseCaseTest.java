@@ -1,7 +1,7 @@
 package dev.chan.drive.app.auth;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -33,39 +33,35 @@ class LoginUseCaseTest {
   @Mock JwtTokenProvider tokenProvider;
 
   @Test
-  void 비밀번호가_일치하지_않으면_로그인에_실패한다() {
-    // given
+  void 비밀번호가_일치하지_않으면_로그인을_거부한다() {
+    // Given
     final User user = User.register(EMAIL, ENCODED_PASSWORD);
 
     given(userRepository.findByEmail(EMAIL)).willReturn(Optional.of(user));
     given(passwordEncoder.matches(RAW_PASSWORD, ENCODED_PASSWORD)).willReturn(false);
 
-    // when
-    final ApiException result =
-        assertThrows(
-            ApiException.class, () -> sut.execute(new LoginUseCase.Input(EMAIL, RAW_PASSWORD)));
-
-    // then
-    assertThat(result.getErrorCode()).isEqualTo(CustomErrorCode.INVALID_CREDENTIALS);
+    // When / Then
+    assertThatThrownBy(() -> sut.execute(new LoginUseCase.Input(EMAIL, RAW_PASSWORD)))
+        .isInstanceOfSatisfying(
+            ApiException.class,
+            exception -> assertThat(exception.getErrorCode()).isEqualTo(CustomErrorCode.INVALID_CREDENTIALS));
   }
 
   @Test
-  void 사용자가_없으면_로그인에_실패한다() {
-    // given
+  void 등록되지_않은_사용자가_로그인을_요청하면_인증을_거부한다() {
+    // Given
     given(userRepository.findByEmail(EMAIL)).willReturn(Optional.empty());
 
-    // when
-    final ApiException result =
-        assertThrows(
-            ApiException.class, () -> sut.execute(new LoginUseCase.Input(EMAIL, RAW_PASSWORD)));
-
-    // then
-    assertThat(result.getErrorCode()).isEqualTo(CustomErrorCode.INVALID_CREDENTIALS);
+    // When / Then
+    assertThatThrownBy(() -> sut.execute(new LoginUseCase.Input(EMAIL, RAW_PASSWORD)))
+        .isInstanceOfSatisfying(
+            ApiException.class,
+            exception -> assertThat(exception.getErrorCode()).isEqualTo(CustomErrorCode.INVALID_CREDENTIALS));
   }
 
   @Test
-  void 로그인_성공() {
-    // given
+  void 올바른_인증정보가_주어지면_접근_토큰을_발급한다() {
+    // Given
     final User user = User.register(EMAIL, ENCODED_PASSWORD);
     ReflectionTestUtils.setField(user, "id", 1L);
 
@@ -76,10 +72,10 @@ class LoginUseCaseTest {
     given(passwordEncoder.matches(RAW_PASSWORD, ENCODED_PASSWORD)).willReturn(true);
     given(tokenProvider.issue(principal)).willReturn(accessToken);
 
-    // when
+    // When
     AccessToken result = sut.execute(new LoginUseCase.Input(EMAIL, RAW_PASSWORD));
 
-    // then
+    // Then
     assertThat(result.value()).isEqualTo("token");
     then(userRepository).should().findByEmail(EMAIL);
 

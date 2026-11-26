@@ -11,13 +11,13 @@ import lombok.*;
 @Entity
 @Table(
     name = "drive",
-    uniqueConstraints = {@UniqueConstraint(name = "uk_user_id", columnNames = "user_id")})
+    uniqueConstraints = {@UniqueConstraint(name = "uk_owner_id", columnNames = "owner_id")})
 public class Drive extends BaseEntity {
   private static final long GB = 1024L * 1024L * 1024L;
   private static final long DEFAULT_QUOTA_BYTES = 50 * GB;
 
   @Column(nullable = false, unique = true)
-  private long userId;
+  private long ownerId;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 30)
@@ -26,7 +26,7 @@ public class Drive extends BaseEntity {
   private long usedBytes;
   private long quotaBytes;
 
-  public static Drive personal(long userId) {
-    return new Drive(userId, DriveType.PERSONAL, 0L, DEFAULT_QUOTA_BYTES);
+  public static Drive personal(long ownerId) {
+    return new Drive(ownerId, DriveType.PERSONAL, 0L, DEFAULT_QUOTA_BYTES);
   }
 }

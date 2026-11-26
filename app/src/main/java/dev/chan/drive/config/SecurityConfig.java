@@ -5,6 +5,7 @@ import dev.chan.drive.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,8 +23,6 @@ public class SecurityConfig {
 
   private final JwtTokenProvider jwtTokenProvider;
   private final JwtTokenResolver jwtTokenResolver;
-  private final JwtProperties jwtProperties;
-  private final AuthenticationEntryPoint entryPoint;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -32,12 +31,13 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(
-      HttpSecurity http, JwtAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
+      final HttpSecurity http, final JwtAuthenticationEntryPoint authenticationEntryPoint)
+      throws Exception {
 
-    JwtAuthenticationFilter jwtAuthenticationFilter =
-        new JwtAuthenticationFilter(jwtTokenProvider, jwtTokenResolver, entryPoint);
+    final JwtAuthenticationFilter jwtAuthenticationFilter =
+        new JwtAuthenticationFilter(jwtTokenProvider, jwtTokenResolver, authenticationEntryPoint);
 
-    return http.securityMatcher("/api/**")
+    return http.securityMatcher("/api/**", "/actuator/**")
         .csrf(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
@@ -49,7 +49,7 @@ public class SecurityConfig {
         .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint))
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/v1/users", "/api/v1/auth/login")
+                auth.requestMatchers(HttpMethod.POST, "/api/v1/users", "/api/v1/auth/login")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

@@ -1,8 +1,8 @@
 package dev.chan.drive.app.user;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dev.chan.drive.error.CustomErrorCode;
 import dev.chan.drive.error.ApiException;
@@ -18,14 +18,18 @@ class PasswordPolicyTest {
   @ParameterizedTest
   @NullAndEmptySource
   @ValueSource(strings = {"invalid"})
-  void validate_fail(String rawPassword) {
-    ApiException result = assertThrows(ApiException.class, () -> policy.validate(rawPassword));
-
-    assertThat(result.getErrorCode()).isEqualTo(CustomErrorCode.INVALID_PASSWORD);
+  void 비밀번호_정책을_충족하지_못하면_비밀번호를_거부한다(String rawPassword) {
+    // When / Then
+    assertThatThrownBy(() -> policy.validate(rawPassword))
+        .isInstanceOfSatisfying(
+            ApiException.class,
+            exception ->
+                assertThat(exception.getErrorCode()).isEqualTo(CustomErrorCode.INVALID_PASSWORD));
   }
 
   @Test
-  void should_pass_when_password_satisfies_policy() {
+  void 비밀번호_정책을_충족하면_검증을_통과한다() {
+    // When / Then
     assertThatCode(() -> policy.validate("Password123!")).doesNotThrowAnyException();
   }
 }
