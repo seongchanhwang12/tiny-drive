@@ -58,11 +58,26 @@ class ItemControllerTest {
         .andExpect(jsonPath("$.upload.requiredHeaders['Content-Type']").value("text/plain"));
   }
 
+  /**
+   * 검증 값
+   * - mimeType이 null 또는 ""인 경우
+   * - fileSize가 음수인 경우
+   * - fileName이 null 또는 ""인 경우
+   *
+   * @param body
+   * @throws Exception
+   */
   @ParameterizedTest
   @ValueSource(
       strings = {
         """
            {"parentId": 10, "mimeType": "text/plain", "fileName": "test.txt", "fileSize": -1}
+        """,
+        """
+          {"parentId": 10, "mimeType": "text/plain", "fileName": "", "fileSize": 10}
+        """,
+        """
+          {"parentId": 10, "mimeType": "", "fileName": "", "fileSize": 10}
         """,
         """
           {"parentId": 10, "mimeType": "text/plain", "fileName": null, "fileSize": 10}
@@ -72,8 +87,7 @@ class ItemControllerTest {
         """,
       })
   @WithMockLoginUser(id = 24L)
-  void 요청값이_올바르지_않으면_400이고_서비스를_호출하지_않는다(final String body)
-      throws Exception {
+  void 요청값이_올바르지_않으면_400이고_서비스를_호출하지_않는다(final String body) throws Exception {
     mockMvc
         .perform(post("/api/v1/items").contentType(MediaType.APPLICATION_JSON).content(body))
         .andExpect(status().isBadRequest());
